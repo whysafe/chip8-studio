@@ -121,6 +121,7 @@ public final class Studio extends JFrame implements EditorPanel.Host {
         left.add(open);
 
         demoBox.setToolTipText("Встроенные демо-программы с исходниками");
+        demoBox.setPreferredSize(new Dimension(130, demoBox.getPreferredSize().height));
         demoBox.addActionListener(e -> {
             if (!updatingDemoBox && demoBox.getSelectedItem() != null) {
                 loadDemo((Demos.Demo) demoBox.getSelectedItem());
