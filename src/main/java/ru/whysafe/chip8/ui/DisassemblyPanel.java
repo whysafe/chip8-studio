@@ -36,6 +36,7 @@ final class DisassemblyPanel extends JPanel {
     private final Map<Integer, Integer> rowByAddress = new HashMap<>();
     private Color accent;
     private int lastPc = -1;
+    private boolean wasRunning;
 
     DisassemblyPanel(EmulatorController controller, Color accent) {
         super(new BorderLayout());
@@ -85,7 +86,8 @@ final class DisassemblyPanel extends JPanel {
     /** Repaints the PC marker; the listing only scrolls after the program when it is paused. */
     void refresh() {
         int pc = controller.chip().pc();
-        if (pc != lastPc && !controller.isRunning()) {
+        boolean running = controller.isRunning();
+        if (!running && (pc != lastPc || wasRunning)) {
             Integer row = rowByAddress.get(pc);
             if (row != null) {
                 list.ensureIndexIsVisible(Math.min(model.size() - 1, row + 4));
@@ -93,6 +95,7 @@ final class DisassemblyPanel extends JPanel {
             }
         }
         lastPc = pc;
+        wasRunning = running;
         list.repaint();
     }
 

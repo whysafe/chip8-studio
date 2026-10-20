@@ -29,7 +29,7 @@ jobs:
       - name: Render the window
         run: |
           sudo apt-get install -y -qq xvfb > /dev/null
-          xvfb-run -s "-screen 0 1600x1000x24" java -jar target/chip8-studio.jar screenshot squash screenshot-ci.png 140
+          xvfb-run -s "-screen 0 1600x1000x24" java -jar target/chip8-studio.jar screenshot maze screenshot-ci.png 150
 
       - uses: actions/upload-artifact@v5
         with:
