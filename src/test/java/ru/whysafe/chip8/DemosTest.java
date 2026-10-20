@@ -37,8 +37,13 @@ class DemosTest {
         for (Demos.Demo demo : Demos.all()) {
             for (Quirks quirks : Quirks.presets()) {
                 Chip8 chip = boot(demo.key, quirks);
-                runFrames(chip, 600);
-                assertTrue(chip.display().litCount() > 0, demo.key + " ничего не нарисовал");
+                // Animations erase and redraw sprites, so any single frame may be caught blank.
+                int mostLit = 0;
+                for (int f = 0; f < 600; f++) {
+                    runFrames(chip, 1);
+                    mostLit = Math.max(mostLit, chip.display().litCount());
+                }
+                assertTrue(mostLit > 0, demo.key + " ничего не нарисовал");
             }
         }
     }
