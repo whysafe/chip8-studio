@@ -34,7 +34,7 @@
                 <version>3.13.0</version>
                 <configuration>
                     <compilerArgs>
-                        <arg>-Xlint:all,-options</arg>
+                        <arg>-Xlint:all,-options,-serial</arg>
                     </compilerArgs>
                 </configuration>
             </plugin>

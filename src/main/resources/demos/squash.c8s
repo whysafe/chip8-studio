@@ -4,7 +4,7 @@
 PADDLE_Y  EQU 30
 TOP_WALL  EQU 7          ; мяч отражается от линии под счётом
 RIGHT_MAX EQU 56         ; правее платформа (8 пикселей) не помещается
-FRAME     EQU 2          ; кадров таймера на один шаг игры
+TICKS     EQU 2          ; тиков таймера на один шаг игры
 
 KEY_LEFT  EQU 7
 KEY_RIGHT EQU 9
@@ -30,7 +30,7 @@ start:
         CALL score
 
 frame:
-        LD V6, FRAME
+        LD V6, TICKS
         LD DT, V6
 
         LD V6, KEY_LEFT
