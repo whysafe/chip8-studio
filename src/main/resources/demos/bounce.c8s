@@ -1,0 +1,33 @@
+; Отскок: шар летает по экрану и отражается от краёв.
+; Хороший пример анимации на таймере задержки и XOR-рисования.
+
+MAX_X EQU 64 - 8
+MAX_Y EQU 32 - 8
+
+        LD V0, 10           ; x
+        LD V1, 5            ; y
+        LD V2, 1            ; dx: 1 или -1 (255)
+        LD V3, 1            ; dy
+        LD I, ball
+loop:
+        DRW V0, V1, 8
+        LD V4, 2
+        LD DT, V4
+wait:
+        LD V4, DT
+        SE V4, 0
+        JP wait
+        DRW V0, V1, 8       ; повторный XOR стирает шар
+        ADD V0, V2
+        ADD V1, V3
+        SNE V0, 0
+        LD V2, 1
+        SNE V0, MAX_X
+        LD V2, -1
+        SNE V1, 0
+        LD V3, 1
+        SNE V1, MAX_Y
+        LD V3, -1
+        JP loop
+
+ball:   DB 0x3C, 0x7E, 0xFF, 0xFF, 0xFF, 0xFF, 0x7E, 0x3C

@@ -1,0 +1,39 @@
+name: build
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+          cache: maven
+
+      - name: Build and test
+        run: mvn -B verify
+
+      - name: Smoke test the command line
+        run: |
+          java -jar target/chip8-studio.jar demos
+          java -jar target/chip8-studio.jar run demo:maze --cycles 3000
+          java -jar target/chip8-studio.jar asm src/main/resources/demos/squash.c8s -o squash.ch8
+          java -jar target/chip8-studio.jar disasm squash.ch8 | head -20
+
+      - name: Render the window
+        run: |
+          sudo apt-get install -y -qq xvfb > /dev/null
+          xvfb-run -s "-screen 0 1600x1000x24" java -jar target/chip8-studio.jar screenshot squash screenshot-ci.png 140
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: chip8-studio
+          path: |
+            target/chip8-studio.jar
+            screenshot-ci.png

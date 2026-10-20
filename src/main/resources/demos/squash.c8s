@@ -1,0 +1,133 @@
+; Сквош: отбивайте мяч платформой и не дайте ему упасть.
+; Управление: 7 / 9 на клавиатуре CHIP-8 (A / D на обычной) — влево / вправо.
+
+PADDLE_Y  EQU 30
+TOP_WALL  EQU 7          ; мяч отражается от линии под счётом
+RIGHT_MAX EQU 56         ; правее платформа (8 пикселей) не помещается
+FRAME     EQU 2          ; кадров таймера на один шаг игры
+
+KEY_LEFT  EQU 7
+KEY_RIGHT EQU 9
+
+; VB, VC — платформа; VD, VE — мяч; V4, V5 — скорость мяча; VA — счёт.
+; V0–V3 заняты под разбор счёта на цифры, V6–V9 — временные.
+
+start:
+        CLS
+        LD VB, 28
+        LD VC, PADDLE_Y
+        RND VD, 0x1F        ; мяч стартует в случайном месте левой половины
+        ADD VD, 8
+        LD VE, 10
+        LD V4, 1
+        LD V5, 1
+        LD VA, 0
+        CALL wall
+        LD I, paddle
+        DRW VB, VC, 1
+        LD I, ball
+        DRW VD, VE, 1
+        CALL score
+
+frame:
+        LD V6, FRAME
+        LD DT, V6
+
+        LD V6, KEY_LEFT
+        SKNP V6
+        CALL left
+        LD V6, KEY_RIGHT
+        SKNP V6
+        CALL right
+
+        LD I, ball           ; стираем мяч, двигаем, рисуем заново
+        DRW VD, VE, 1
+        ADD VD, V4
+        ADD VE, V5
+        SNE VD, 0
+        LD V4, 1
+        SNE VD, 63
+        LD V4, -1
+        SNE VE, TOP_WALL
+        LD V5, 1
+        DRW VD, VE, 1
+
+        SE VE, PADDLE_Y - 1  ; мяч прямо над платформой?
+        JP check_fall
+        LD V7, VD
+        SUB V7, VB           ; V7 = мяч - платформа, VF = 0 если мяч левее
+        SE VF, 1
+        JP wait
+        LD V9, 0xF8          ; V7 < 8  <=>  V7 & 0xF8 == 0
+        AND V9, V7
+        SE V9, 0
+        JP wait
+        LD V5, -1            ; попал: отражаем и добавляем очко
+        CALL score
+        ADD VA, 1
+        CALL score
+        LD V6, 2
+        LD ST, V6
+        JP wait
+
+check_fall:
+        SE VE, 31
+        JP wait
+        LD V6, 30            ; мяч упал: длинный гудок и ждём любую клавишу
+        LD ST, V6
+        LD V6, K
+        JP start
+
+wait:
+        LD V6, DT
+        SE V6, 0
+        JP wait
+        JP frame
+
+left:
+        SNE VB, 0
+        RET
+        LD I, paddle
+        DRW VB, VC, 1
+        ADD VB, -1
+        DRW VB, VC, 1
+        RET
+
+right:
+        SNE VB, RIGHT_MAX
+        RET
+        LD I, paddle
+        DRW VB, VC, 1
+        ADD VB, 1
+        DRW VB, VC, 1
+        RET
+
+; Рисует (или стирает, XOR) две младшие цифры счёта в левом верхнем углу.
+score:
+        LD I, digits
+        LD B, VA
+        LD V2, [I]
+        LD V3, 1
+        LD V6, 1
+        LD F, V1
+        DRW V3, V6, 5
+        LD V3, 6
+        LD F, V2
+        DRW V3, V6, 5
+        RET
+
+wall:
+        LD I, line
+        LD V6, 0
+        LD V7, TOP_WALL - 1
+wall_next:
+        DRW V6, V7, 1
+        ADD V6, 8
+        SE V6, 64
+        JP wall_next
+        RET
+
+paddle: DB 0xFF
+ball:   DB 0x80
+line:   DB 0xFF
+digits: DB 0, 0, 0

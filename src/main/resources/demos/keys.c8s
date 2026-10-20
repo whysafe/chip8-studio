@@ -1,0 +1,20 @@
+; Клавиши: нажмите и отпустите клавишу — на экране появится её код.
+; Помогает проверить раскладку: 1234 / QWER / ASDF / ZXCV.
+
+        LD V5, 0            ; показанная цифра
+        LD V6, 30           ; x
+        LD V7, 13           ; y
+        CALL show
+main:
+        LD V8, K
+        CALL show           ; стираем старую цифру
+        LD V5, V8
+        CALL show           ; рисуем новую
+        LD V9, 4
+        LD ST, V9
+        JP main
+
+show:
+        LD F, V5
+        DRW V6, V7, 5
+        RET

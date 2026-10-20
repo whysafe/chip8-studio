@@ -1,0 +1,9 @@
+target/
+*.class
+*.ch8
+!examples/*.ch8
+screenshot-ci.png
+.idea/
+*.iml
+.vscode/
+.DS_Store
