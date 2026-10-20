@@ -63,6 +63,7 @@ public final class Studio extends JFrame implements EditorPanel.Host {
     private final JButton runButton = new JButton("Пауза", Icons.pause());
     private final JComboBox<Demos.Demo> demoBox = new JComboBox<>(Demos.all().toArray(new Demos.Demo[0]));
     private final JLabel hint = new JLabel(" ");
+    private final JLabel brand = new JLabel("CHIP-8 STUDIO");
     private final JLabel statusLeft = new JLabel(" ");
     private final JLabel statusRight = new JLabel(" ");
     private boolean updatingDemoBox;
@@ -94,7 +95,7 @@ public final class Studio extends JFrame implements EditorPanel.Host {
         controller.onFrame(this::onFrame);
         controller.onProgramLoaded(listing::reload);
 
-        setMinimumSize(new Dimension(980, 640));
+        setMinimumSize(new Dimension(1100, 680));
         setSize(1280, 800);
         setLocationRelativeTo(null);
     }
@@ -109,7 +110,6 @@ public final class Studio extends JFrame implements EditorPanel.Host {
             BorderFactory.createEmptyBorder(8, 12, 8, 12)));
 
         JPanel left = row();
-        JLabel brand = new JLabel("CHIP-8 STUDIO");
         brand.setFont(Theme.MONO_LARGE.deriveFont(java.awt.Font.BOLD));
         brand.setForeground(palette.accent);
         brand.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 14));
@@ -161,15 +161,10 @@ public final class Studio extends JFrame implements EditorPanel.Host {
         quirks.setToolTipText("Набор особенностей интерпретатора. Если игра ведёт себя странно — переключите.");
         quirks.addActionListener(e -> controller.setQuirks((Quirks) quirks.getSelectedItem()));
 
-        JComboBox<Theme.Palette> palettes = new JComboBox<>(Theme.PALETTES.toArray(new Theme.Palette[0]));
-        palettes.addActionListener(e -> applyPalette((Theme.Palette) palettes.getSelectedItem(), brand));
-
         right.add(label("Скорость"));
         right.add(speed);
         right.add(label("Режим"));
         right.add(quirks);
-        right.add(label("Экран"));
-        right.add(palettes);
         bar.add(right, BorderLayout.EAST);
         return bar;
     }
@@ -188,6 +183,12 @@ public final class Studio extends JFrame implements EditorPanel.Host {
         under.add(hint, BorderLayout.WEST);
 
         JPanel toggles = row();
+        JComboBox<Theme.Palette> palettes = new JComboBox<>(Theme.PALETTES.toArray(new Theme.Palette[0]));
+        palettes.setToolTipText("Цвета экрана");
+        palettes.addActionListener(e -> applyPalette((Theme.Palette) palettes.getSelectedItem()));
+        toggles.add(label("Палитра"));
+        toggles.add(palettes);
+        toggles.add(Box.createHorizontalStrut(6));
         JCheckBox glow = checkbox("Послесвечение", true, on -> screen.setPersistence(on));
         glow.setToolTipText("Плавное затухание пикселей убирает мерцание, типичное для CHIP-8");
         toggles.add(glow);
@@ -389,7 +390,7 @@ public final class Studio extends JFrame implements EditorPanel.Host {
         updatingDemoBox = false;
     }
 
-    private void applyPalette(Theme.Palette next, JLabel brand) {
+    private void applyPalette(Theme.Palette next) {
         palette = next;
         screen.setPalette(next);
         registers.setAccent(next.accent);
